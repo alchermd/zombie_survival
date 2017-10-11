@@ -3,6 +3,8 @@ game.py - contains game instance classes.
 """
 import pygame
 import gamelib.palette as p
+from gamelib.sprite import Player
+
 
 class Game(object):
     """
@@ -12,6 +14,19 @@ class Game(object):
         self.screen = screen
         self.color = color
         self.title = title
+
+        # Sprite groups.
+        self.all_sprites = pygame.sprite.Group()
+
+        # Create the main player.
+        self.player = Player(p.white, 40, 50)
+        self.player.set_position(
+            screen.get_width() / 2 - self.player.image.get_width() / 2,
+            screen.get_height() - 75
+        )
+
+        # Save sprites.
+        self.all_sprites.add(self.player)
 
     
     def handle_events(self) -> bool:
@@ -26,6 +41,18 @@ class Game(object):
             if event.type == pygame.QUIT:
                 return False
 
+            if event.type == pygame.KEYDOWN:
+                # Bind LEFT and RIGHT keys to player movement.
+                if event.key == pygame.K_LEFT:
+                    self.player.move_laterally(-5)
+                if event.key == pygame.K_RIGHT:
+                    self.player.move_laterally(5)
+
+            if event.type == pygame.KEYUP:
+                # Smoothen the player's movement.
+                if event.key in (pygame.K_LEFT, pygame.K_RIGHT):
+                    self.player.move_laterally(0)
+
         return True
 
 
@@ -33,7 +60,7 @@ class Game(object):
         """
         Runs the logic for running the game.
         """
-        pass
+        self.all_sprites.update()
 
 
     def display_frame(self, screen: pygame.Surface=None):
@@ -47,5 +74,7 @@ class Game(object):
             screen = self.screen
 
         screen.fill(self.color)
+
+        self.all_sprites.draw(screen)
 
         pygame.display.flip()
