@@ -19,11 +19,10 @@ def main():
     
     # Meta variables.
     fps = 30
-    clock = pygame.time.Clock()
 
     # Main game loop.
     while game.handle_events():
-        clock.tick(fps)
+        game.clock.tick(fps)
 
         game.run_game_logic()
 

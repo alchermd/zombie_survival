@@ -14,6 +14,7 @@ class Game(object):
         self.screen = screen
         self.color = color
         self.title = title
+        self.clock = pygame.time.Clock()
 
         # Sprite groups.
         self.all_sprites = pygame.sprite.Group()
