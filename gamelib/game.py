@@ -100,6 +100,12 @@ class Game(object):
         """
         self.all_sprites.update()
 
+        # Check for bullet to zombie collisions.
+        for bullet in self.player.bullets:
+            zombies_hit = pygame.sprite.spritecollide(bullet, self.zombies, True)
+            if zombies_hit:
+                bullet.kill()
+
 
     def display_frame(self, screen: pygame.Surface=None):
         """
