@@ -3,7 +3,7 @@ game.py - contains game instance classes.
 """
 import pygame
 import gamelib.palette as p
-from gamelib.sprite import Player
+from gamelib.sprite import Player, Zombie
 
 
 class Game(object):
@@ -18,6 +18,7 @@ class Game(object):
 
         # Sprite groups.
         self.all_sprites = pygame.sprite.Group()
+        self.zombies = pygame.sprite.Group()
 
         # Create the main player.
         self.player = Player(p.white, 40, 50)
@@ -25,6 +26,26 @@ class Game(object):
             screen.get_width() / 2 - self.player.image.get_width() / 2,
             screen.get_height() - 75
         )
+
+        # Create 6 zombies, 3 from left and
+        # 3 from right, to test issue #2
+        for i in range(3):
+            zombie = Zombie(p.red, 40, 50)
+            zombie.set_position(
+                -(40 + i * 60),
+                screen.get_height() - 75
+            )
+            zombie.move_laterally(3)
+            zombie.add(self.all_sprites, self.zombies)
+        
+        for i in range(3):
+            zombie = Zombie(p.red, 40, 50)
+            zombie.set_position(
+                screen.get_width() + 40 + i * 60,
+                screen.get_height() - 75
+            )
+            zombie.move_laterally(-3)
+            zombie.add(self.all_sprites, self.zombies)
 
         # Save sprites.
         self.all_sprites.add(self.player)
