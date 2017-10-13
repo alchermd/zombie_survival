@@ -3,7 +3,7 @@ game.py - contains game instance classes.
 """
 import pygame
 import gamelib.palette as p
-from gamelib.sprite import Player, Zombie, Bullet
+from gamelib.sprite import Player, Zombie, Bullet, HealthPack, AmmoPack
 
 
 class Game(object):
@@ -19,6 +19,7 @@ class Game(object):
         # Sprite groups.
         self.all_sprites = pygame.sprite.Group()
         self.zombies = pygame.sprite.Group()
+        self.powerups = pygame.sprite.Group()
 
         # Create the main player.
         self.player = Player(p.white, 40, 50, 25)
@@ -47,10 +48,20 @@ class Game(object):
             zombie.move_laterally(-3)
             zombie.add(self.all_sprites, self.zombies)
 
-        # Save sprites.
-        self.all_sprites.add(self.player)
+        # Create 2 powerups to test issues #3 and #4
+        healthpack = HealthPack(p.green, 20, 20, screen, 5)
+        healthpack.set_position(30, -40)
+        healthpack.move_vertically(2)
 
+        ammopack = AmmoPack(p.white, 20, 20, screen, 5) 
+        ammopack.set_position(screen.get_width() - 30, -20)
+        ammopack.move_vertically(2)
+
+        # Save sprites.
+        self.powerups.add(ammopack, healthpack)
+        self.all_sprites.add(self.player, ammopack, healthpack)
     
+
     def handle_events(self) -> bool:
         """
         Processes the events in the Pygame event queue.
@@ -120,6 +131,17 @@ class Game(object):
             self.player.hp -= 1
             print("HP: {:2}".format(self.player.hp))
 
+        # Check for powerup to player collisions.
+        powerups_hit = pygame.sprite.spritecollide(self.player, self.powerups, True)
+        for powerup in powerups_hit:
+            if isinstance(powerup, HealthPack):
+                self.player.hp += powerup.heal_amount
+                print("HP: {:2}".format(self.player.hp))
+            elif isinstance(powerup, AmmoPack):
+                self.player.ammo += powerup.ammo_count
+                print("Ammo: {:2}".format(self.player.ammo))
+
+        
         # Check for win / lose conditions.
         if self.player.hp <= 0:
             print("You lost!")
