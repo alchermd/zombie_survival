@@ -7,7 +7,7 @@ import gamelib.palette as p
 
 class BaseSprite(pygame.sprite.Sprite):
     """
-    Represents the base sprite that moves laterally.
+    Represents the base sprite that moves in both x and y axis.
     """
     def __init__(self, color: pygame.Color, width: int, height: int):
         """
@@ -29,6 +29,7 @@ class BaseSprite(pygame.sprite.Sprite):
 
         # BaseSprite velocity.
         self.x_speed = 0
+        self.y_speed = 0
 
 
     def set_position(self, x: int, y: int):
@@ -52,6 +53,17 @@ class BaseSprite(pygame.sprite.Sprite):
         """
         self.x_speed = x_speed
 
+    
+    def move_vertically(self, y_speed: int):
+        """
+        Sets the BaseSprite's y_speed.
+
+        Args:
+            y_speed: the new velocity in which the BaseSprite moves on
+                the y-axis.
+        """
+        self.y_speed = y_speed
+
 
     def update(self):
         """
@@ -60,6 +72,9 @@ class BaseSprite(pygame.sprite.Sprite):
         """
         # Move the BaseSprite on the x-axis.
         self.rect.x += self.x_speed
+
+        # Move the BaseSprite on the y-axis.
+        self.rect.y += self.y_speed
 
 
 class Bullet(BaseSprite):
