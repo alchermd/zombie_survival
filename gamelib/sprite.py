@@ -74,7 +74,7 @@ class Player(BaseSprite):
     """
     Represents the player-controlled sprite.
     """
-    def __init__(self, color: pygame.Color, width: int, height: int, bullet_speed: int):
+    def __init__(self, color: pygame.Color, width: int, height: int, bullet_x_speed: int):
         """
         Creates a new Player instance. See the BaseSprite class constructor
         for more information.
@@ -89,8 +89,7 @@ class Player(BaseSprite):
         self.bullets = pygame.sprite.Group()
 
         # Set an initial bullet velocity.
-        self.bullet_speed = bullet_speed
-        self.bullet_x_speed = bullet_speed
+        self.bullet_x_speed = abs(bullet_x_speed)
 
 
     def calc_bullet_info(self, bullet: Bullet) -> list:
@@ -125,9 +124,9 @@ class Player(BaseSprite):
         super().update()
 
         if self.x_speed > 0:
-            self.bullet_x_speed = self.bullet_speed
+            self.bullet_x_speed = abs(self.bullet_x_speed)
         elif self.x_speed < 0:
-            self.bullet_x_speed = -self.bullet_speed
+            self.bullet_x_speed = -abs(self.bullet_x_speed)
 
 
 class Zombie(BaseSprite):
