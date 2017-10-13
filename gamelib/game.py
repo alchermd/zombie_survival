@@ -72,17 +72,25 @@ class Game(object):
 
 
                 # Bind SPACE to shoot bullets.
-                if event.key == pygame.K_SPACE:
-                    # Create a new bullet.
-                    bullet = Bullet(p.blue, 20, 20)
+                if event.key == pygame.K_SPACE: 
+                    if self.player.ammo > 0:
+                        # Create a new bullet.
+                        bullet = Bullet(p.blue, 20, 20)
 
-                    # Set its position and velocity.
-                    bullet_x, bullet_y, bullet_x_speed = self.player.calc_bullet_info(bullet)
-                    bullet.set_position(bullet_x, bullet_y)
-                    bullet.move_laterally(bullet_x_speed)
+                        # Set its position and velocity.
+                        bullet_x, bullet_y, bullet_x_speed = self.player.calc_bullet_info(bullet)
+                        bullet.set_position(bullet_x, bullet_y)
+                        bullet.move_laterally(bullet_x_speed)
 
-                    # Save the bullet.
-                    bullet.add(self.all_sprites, self.player.bullets)
+                        # Save the bullet.
+                        bullet.add(self.all_sprites, self.player.bullets)
+
+                        # Reduce the player's ammo.
+                        self.player.ammo -= 1
+                        print("Ammo: {:2}".format(self.player.ammo))
+                    
+                    else:
+                        print("No more ammo.")
 
 
             if event.type == pygame.KEYUP:
@@ -105,6 +113,16 @@ class Game(object):
             zombies_hit = pygame.sprite.spritecollide(bullet, self.zombies, True)
             if zombies_hit:
                 bullet.kill()
+
+        # Check for zombie to player collisions.
+        zombies_hit = pygame.sprite.spritecollide(self.player, self.zombies, True)
+        for zombie in zombies_hit:
+            self.player.hp -= 1
+            print("HP: {:2}".format(self.player.hp))
+
+        # Check for win / lose conditions.
+        if self.player.hp <= 0:
+            print("You lost!")
 
 
     def display_frame(self, screen: pygame.Surface=None):
