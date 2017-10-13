@@ -153,3 +153,75 @@ class Zombie(BaseSprite):
     Represents the zombie sprite that tries to overwhelm the player.
     """
     pass
+
+
+class PowerUp(BaseSprite):
+    """
+    Represents a falling object that gives the player resources.
+    """
+    def __init__(self, color: pygame.Color, width: int, height: int, screen: pygame.Surface):
+        """
+        Creates a new PowerUp instance. See BaseSprite class for inherited paremeters.
+        
+        Args:
+            screen: the surface in which the PowerUp is to be drawn.
+        """
+        super().__init__(color, width, height)
+
+        self.screen = screen
+
+
+    def update(self):
+        """
+        Modified update method to prevent the PowerUp from dropping
+        off screen.
+        """
+        super().update()
+
+        # Check if at the bottom of the screen.
+        if self.rect.bottom >= self.screen.get_height() - 25:
+            self.rect.bottom = self.screen.get_height() - 25
+
+
+class HealthPack(PowerUp):
+    """
+    Represents a powerup that gives the player some health points
+    when picked up.
+    """
+    def __init__(self, color: pygame.Color, width: int, height: int, screen: pygame.Surface, heal_amount: int):
+        """
+        Creates a new HealthPack instance. See PowerUp class for inherited paremeters.
+        
+        Args:
+            heal_amount: the amount of health that the player replenishes when
+                this pack is picked up.
+        """
+        super().__init__(color, width, height, screen)
+
+        self.heal_amount = heal_amount
+
+
+    def __repr__(self):
+        return "<HealthPack +{} />".format(self.heal_amount)
+
+
+class AmmoPack(PowerUp):
+    """
+    Represents a powerup that gives the player some ammunition
+    when picked up.
+    """
+    def __init__(self, color: pygame.Color, width: int, height: int, screen: pygame.Surface, ammo_count: int):
+        """
+        Creates a new AmmoPack instance. See PowerUp class for inherited paremeters.
+        
+        Args:
+            ammo_count: the amount of ammo that the player replenishes when
+                this pack is picked up.
+        """
+        super().__init__(color, width, height, screen)
+
+        self.ammo_count = ammo_count
+
+
+    def __repr__(self):
+        return "<AmmoPack +{} />".format(self.ammo_count)
