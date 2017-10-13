@@ -85,6 +85,10 @@ class Player(BaseSprite):
         """
         super().__init__(color, width, height)
 
+        # Player stats.
+        self.hp = 5
+        self.ammo = 10
+
         # Bullets from the player.
         self.bullets = pygame.sprite.Group()
 
