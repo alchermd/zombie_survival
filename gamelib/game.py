@@ -3,7 +3,7 @@ game.py - contains game instance classes.
 """
 import pygame
 import gamelib.palette as p
-from gamelib.sprite import Player, Zombie
+from gamelib.sprite import Player, Zombie, Bullet
 
 
 class Game(object):
@@ -21,7 +21,7 @@ class Game(object):
         self.zombies = pygame.sprite.Group()
 
         # Create the main player.
-        self.player = Player(p.white, 40, 50)
+        self.player = Player(p.white, 40, 50, 25)
         self.player.set_position(
             screen.get_width() / 2 - self.player.image.get_width() / 2,
             screen.get_height() - 75
@@ -70,10 +70,26 @@ class Game(object):
                 if event.key == pygame.K_RIGHT:
                     self.player.move_laterally(5)
 
+
+                # Bind SPACE to shoot bullets.
+                if event.key == pygame.K_SPACE:
+                    # Create a new bullet.
+                    bullet = Bullet(p.blue, 20, 20)
+
+                    # Set its position and velocity.
+                    bullet_x, bullet_y, bullet_x_speed = self.player.calc_bullet_info(bullet)
+                    bullet.set_position(bullet_x, bullet_y)
+                    bullet.move_laterally(bullet_x_speed)
+
+                    # Save the bullet.
+                    bullet.add(self.all_sprites, self.player.bullets)
+
+
             if event.type == pygame.KEYUP:
                 # Smoothen the player's movement.
                 if event.key in (pygame.K_LEFT, pygame.K_RIGHT):
                     self.player.move_laterally(0)
+
 
         return True
 
