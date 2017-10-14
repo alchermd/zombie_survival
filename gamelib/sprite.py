@@ -152,13 +152,19 @@ class Zombie(BaseSprite):
     """
     Represents the zombie sprite that tries to overwhelm the player.
     """
-    pass
+    spawn_interval = 7000       # Zombies spawn every 7 seconds
+    interval_difference = 250   # Each spawn gets faster at 1/4 of a second
+    current_tick = None         # Replaced with the current clock tick.
 
 
 class PowerUp(BaseSprite):
     """
     Represents a falling object that gives the player resources.
     """
+    spawn_interval = 5000           # Healthpack spawns every 5 seconds
+    interval_difference = -100      # Each spawn gets slower at 1/10 of a second
+    current_tick = None             # Replaced with the current clock tick.
+
     def __init__(self, color: pygame.Color, width: int, height: int, screen: pygame.Surface):
         """
         Creates a new PowerUp instance. See BaseSprite class for inherited paremeters.
