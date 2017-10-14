@@ -16,8 +16,11 @@ class Game(object):
         self.color = color
         self.title = title
 
-        # Clock instance.
+        # Clock and time.
         self.clock = pygame.time.Clock()
+        self.last_tick = pygame.time.get_ticks()
+        self.spawn_interval = 7000          # Zombies spawn every 7 seconds
+        self.interval_decrement = 250       # Each spawn gets faster at 1/4 of a second
 
         # Toggled for early game exits.
         self.aborted = False
@@ -34,26 +37,6 @@ class Game(object):
             screen.get_height() - 75
         )
 
-        # Create 6 zombies, 3 from left and
-        # 3 from right, to test issue #2
-        for i in range(3):
-            zombie = Zombie(p.red, 40, 50)
-            zombie.set_position(
-                -(40 + i * 60),
-                screen.get_height() - 75
-            )
-            zombie.move_laterally(3)
-            zombie.add(self.all_sprites, self.zombies)
-        
-        for i in range(3):
-            zombie = Zombie(p.red, 40, 50)
-            zombie.set_position(
-                screen.get_width() + 40 + i * 60,
-                screen.get_height() - 75
-            )
-            zombie.move_laterally(-3)
-            zombie.add(self.all_sprites, self.zombies)
-
         # Create 2 powerups to test issues #3 and #4
         healthpack = HealthPack(p.green, 20, 20, screen, 5)
         healthpack.set_position(30, -40)
@@ -67,6 +50,40 @@ class Game(object):
         self.powerups.add(ammopack, healthpack)
         self.all_sprites.add(self.player, ammopack, healthpack)
     
+    
+    def create_zombies(self, n: int, right: int=None):
+        """
+        Create new zombies that will get spawned on the
+        next update() call.
+
+        Args:
+            n: the amount of zombies that spawn on each side.
+            right: if given, n will constitute to the zombies
+                to the left.
+        """
+        if right is None:
+            right = n
+        
+        # Zombies from the left.
+        for i in range(n):
+            zombie = Zombie(p.red, 40, 50)
+            zombie.set_position(
+                -(40 + i * 60),
+                self.screen.get_height() - 75
+            )
+            zombie.move_laterally(3)
+            zombie.add(self.all_sprites, self.zombies)
+        
+        # Zombies from the right.
+        for i in range(right):
+            zombie = Zombie(p.red, 40, 50)
+            zombie.set_position(
+                self.screen.get_width() + 40 + i * 60,
+                self.screen.get_height() - 75
+            )
+            zombie.move_laterally(-3)
+            zombie.add(self.all_sprites, self.zombies)
+
 
     def handle_events(self) -> bool:
         """
@@ -128,6 +145,13 @@ class Game(object):
         Runs the logic for running the game.
         """
         self.all_sprites.update()
+
+        # Check if enough time has passed to spawn zombies.
+        current_tick = pygame.time.get_ticks()
+        if current_tick - self.last_tick >= self.spawn_interval:
+            self.spawn_interval -= self.interval_decrement
+            self.last_tick = current_tick
+            self.create_zombies(3)
 
         # Check for bullet to zombie collisions.
         for bullet in self.player.bullets:
