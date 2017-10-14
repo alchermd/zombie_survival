@@ -2,8 +2,9 @@
 game.py - contains game instance classes.
 """
 import pygame
+import random
 import gamelib.palette as p
-from gamelib.sprite import Player, Zombie, Bullet, HealthPack, AmmoPack
+from gamelib.sprite import Player, Zombie, Bullet, PowerUp, HealthPack, AmmoPack
 
 
 class Game(object):
@@ -18,9 +19,8 @@ class Game(object):
 
         # Clock and time.
         self.clock = pygame.time.Clock()
-        self.last_tick = pygame.time.get_ticks()
-        self.spawn_interval = 7000          # Zombies spawn every 7 seconds
-        self.interval_decrement = 250       # Each spawn gets faster at 1/4 of a second
+        Zombie.last_tick = pygame.time.get_ticks()
+        PowerUp.last_tick = pygame.time.get_ticks()
 
         # Toggled for early game exits.
         self.aborted = False
@@ -37,20 +37,53 @@ class Game(object):
             screen.get_height() - 75
         )
 
-        # Create 2 powerups to test issues #3 and #4
-        healthpack = HealthPack(p.green, 20, 20, screen, 5)
-        healthpack.set_position(30, -40)
-        healthpack.move_vertically(2)
-
-        ammopack = AmmoPack(p.white, 20, 20, screen, 5) 
-        ammopack.set_position(screen.get_width() - 30, -20)
-        ammopack.move_vertically(2)
-
         # Save sprites.
-        self.powerups.add(ammopack, healthpack)
-        self.all_sprites.add(self.player, ammopack, healthpack)
+        self.all_sprites.add(self.player)
     
-    
+
+    def create_powerups(self, n: int):
+        """
+        Create new powerups that will get spawned on the
+        next update() call.
+
+        Args:
+            n: the amount of powerups that spawn. Half of n will
+             HealthPacks and half will be AmmoPacks
+        """
+        for i in range(n):
+            if i % 2 == 0:
+                # Create a new health pack.        
+                healthpack = HealthPack(p.green, 20, 20, self.screen, 5)
+
+                # Randomly set its position.
+                healthpack.set_position(
+                    random.randrange(self.screen.get_width() - 20),
+                    random.randrange(-100, 0)
+                )
+
+                # Set its vertical speed.
+                healthpack.move_vertically(2)
+
+                # Save sprite.
+                healthpack.add(self.powerups, self.all_sprites)
+
+            else:
+                # Create a new health pack.   
+                ammopack = AmmoPack(p.white, 20, 20, self.screen, 5) 
+
+                # Randomly set its position.
+                ammopack.set_position(
+                    random.randrange(self.screen.get_width() - 20),
+                    random.randrange(-100, 0)
+                )
+
+                # Set its vertical speed.
+                ammopack.move_vertically(2)
+
+                # Save sprite.
+                ammopack.add(self.powerups, self.all_sprites)
+
+
     def create_zombies(self, n: int, right: int=None):
         """
         Create new zombies that will get spawned on the
@@ -147,11 +180,18 @@ class Game(object):
         self.all_sprites.update()
 
         # Check if enough time has passed to spawn zombies.
-        current_tick = pygame.time.get_ticks()
-        if current_tick - self.last_tick >= self.spawn_interval:
-            self.spawn_interval -= self.interval_decrement
-            self.last_tick = current_tick
+        Zombie.current_tick = pygame.time.get_ticks()
+        if Zombie.current_tick - Zombie.last_tick >= Zombie.spawn_interval:
+            Zombie.spawn_interval -= Zombie.interval_difference
+            Zombie.last_tick = Zombie.current_tick
             self.create_zombies(3)
+
+        # Check if enough time has passed to drop powerups.
+        PowerUp.current_tick = pygame.time.get_ticks()
+        if PowerUp.current_tick - PowerUp.last_tick >= PowerUp.spawn_interval:
+            PowerUp.spawn_interval -= PowerUp.interval_difference
+            PowerUp.last_tick = PowerUp.current_tick
+            self.create_powerups(2)
 
         # Check for bullet to zombie collisions.
         for bullet in self.player.bullets:
