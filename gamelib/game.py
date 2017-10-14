@@ -11,10 +11,16 @@ class Game(object):
     Represents the framework for a Pygame project.
     """
     def __init__(self, screen: pygame.Surface, color: tuple, title: str):
+        # Display attributes.
         self.screen = screen
         self.color = color
         self.title = title
+
+        # Clock instance.
         self.clock = pygame.time.Clock()
+
+        # Toggled for early game exits.
+        self.aborted = False
 
         # Sprite groups.
         self.all_sprites = pygame.sprite.Group()
@@ -70,6 +76,10 @@ class Game(object):
             A boolean value indicating whether the game is still
             processing events or not.
         """
+        # Check for early game exits.
+        if self.aborted:
+            return False
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return False
@@ -144,7 +154,18 @@ class Game(object):
         
         # Check for win / lose conditions.
         if self.player.hp <= 0:
-            print("You lost!")
+            self.abort_game("You lost!")
+
+
+    def abort_game(self, message: str):
+        """
+        Preemptively aborts the game.
+
+        Args:
+            message: an exit message to be printed to the console.
+        """
+        self.aborted = True
+        print(message)
 
 
     def display_frame(self, screen: pygame.Surface=None):
