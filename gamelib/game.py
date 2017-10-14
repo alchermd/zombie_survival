@@ -12,10 +12,16 @@ class Game(object):
     Represents the framework for a Pygame project.
     """
     def __init__(self, screen: pygame.Surface, color: tuple, title: str):
+        # Meta attributes.
+        self.score = 0
+        
         # Display attributes.
         self.screen = screen
         self.color = color
         self.title = title
+
+        # Text and fonts.
+        self.game_font = pygame.font.Font(None, 30)        
 
         # Clock and time.
         self.clock = pygame.time.Clock()
@@ -118,6 +124,24 @@ class Game(object):
             zombie.add(self.all_sprites, self.zombies)
 
 
+    def show_scoreboard(self):
+        """
+        Calculates and draws the game stats in the screen.
+        """
+        scoreboard_text = [
+            self.game_font.render("HP: {:3}".format(self.player.hp), True, p.white),
+            self.game_font.render("Ammo: {:3}".format(self.player.ammo), True, p.white),
+            self.game_font.render("Score: {:3}".format(self.score), True, p.white),
+            self.game_font.render("Time: {:3.2f}".format(pygame.time.get_ticks() * 0.001), True, p.white),
+        ]
+
+        margin = 50
+        self.screen.blit(scoreboard_text[0], (margin, 50))
+        self.screen.blit(scoreboard_text[1], (margin, 100))
+        self.screen.blit(scoreboard_text[2], (margin, 150))
+        self.screen.blit(scoreboard_text[3], (margin, 200))
+
+
     def handle_events(self) -> bool:
         """
         Processes the events in the Pygame event queue.
@@ -158,10 +182,6 @@ class Game(object):
 
                         # Reduce the player's ammo.
                         self.player.ammo -= 1
-                        print("Ammo: {:2}".format(self.player.ammo))
-                    
-                    else:
-                        print("No more ammo.")
 
 
             if event.type == pygame.KEYUP:
@@ -196,24 +216,24 @@ class Game(object):
         # Check for bullet to zombie collisions.
         for bullet in self.player.bullets:
             zombies_hit = pygame.sprite.spritecollide(bullet, self.zombies, True)
-            if zombies_hit:
+            for zombie in  zombies_hit:
+                self.score += 3
                 bullet.kill()
 
         # Check for zombie to player collisions.
         zombies_hit = pygame.sprite.spritecollide(self.player, self.zombies, True)
         for zombie in zombies_hit:
             self.player.hp -= 1
-            print("HP: {:2}".format(self.player.hp))
 
         # Check for powerup to player collisions.
         powerups_hit = pygame.sprite.spritecollide(self.player, self.powerups, True)
         for powerup in powerups_hit:
             if isinstance(powerup, HealthPack):
                 self.player.hp += powerup.heal_amount
-                print("HP: {:2}".format(self.player.hp))
             elif isinstance(powerup, AmmoPack):
                 self.player.ammo += powerup.ammo_count
-                print("Ammo: {:2}".format(self.player.ammo))
+
+            self.score += 1
 
         
         # Check for win / lose conditions.
@@ -244,6 +264,7 @@ class Game(object):
 
         screen.fill(self.color)
 
+        self.show_scoreboard()
         self.all_sprites.draw(screen)
 
         pygame.display.flip()
