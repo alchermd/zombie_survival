@@ -161,7 +161,7 @@ class PowerUp(BaseSprite):
     """
     Represents a falling object that gives the player resources.
     """
-    spawn_interval = 5000           # Healthpack spawns every 5 seconds
+    spawn_interval = 5000           # Powerup spawns every 5 seconds
     interval_difference = -100      # Each spawn gets slower at 1/10 of a second
     current_tick = None             # Replaced with the current clock tick.
 

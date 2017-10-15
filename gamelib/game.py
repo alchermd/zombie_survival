@@ -54,7 +54,7 @@ class Game(object):
 
         Args:
             n: the amount of powerups that spawn. Half of n will
-             HealthPacks and half will be AmmoPacks
+             be HealthPacks and half will be AmmoPacks
         """
         for i in range(n):
             if i % 2 == 0:
@@ -74,7 +74,7 @@ class Game(object):
                 healthpack.add(self.powerups, self.all_sprites)
 
             else:
-                # Create a new health pack.   
+                # Create a new ammo pack.   
                 ammopack = AmmoPack(p.white, 20, 20, self.screen, 5) 
 
                 # Randomly set its position.
