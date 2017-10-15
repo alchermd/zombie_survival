@@ -2,7 +2,7 @@
 sprite.py - contains sprite classes derived from the pygame.sprite.Sprite class.
 """
 import pygame
-import gamelib.palette as p
+import rzd.gamelib.palette as p
 
 
 class BaseSprite(pygame.sprite.Sprite):

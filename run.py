@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import pygame
-import gamelib.palette as p
-from gamelib.game import Game
+import rzd.gamelib.palette as p
+from rzd.game import Game
 
 def main():
     # Pre-initialize the pygame sound engine.

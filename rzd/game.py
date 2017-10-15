@@ -3,8 +3,8 @@ game.py - contains game instance classes.
 """
 import pygame
 import random
-import gamelib.palette as p
-from gamelib.sprite import Player, Zombie, Bullet, PowerUp, HealthPack, AmmoPack
+import rzd.gamelib.palette as p
+from rzd.gamelib.sprite import Player, Zombie, Bullet, PowerUp, HealthPack, AmmoPack
 
 
 class Game(object):
